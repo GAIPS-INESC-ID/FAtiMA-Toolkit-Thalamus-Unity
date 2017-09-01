@@ -24,13 +24,12 @@ public class SingleCharacterDemo : MonoBehaviour
 
     private string CurrentDialogueState;
 
-    //ThalamusUnity TUC;
-    //ThalamusConnector TUC;
+    private ThalamusConnector TUC;
 
     // Use this for initialization
     private void Start()
     {
-        //TUC = new ThalamusConnector(this);
+        TUC = new ThalamusConnector(this);
 
         AssetManager.Instance.Bridge = new AssetManagerBridge();
 
@@ -73,8 +72,9 @@ public class SingleCharacterDemo : MonoBehaviour
             var dialog = dialogs.Shuffle().FirstOrDefault();
 
             HandleSpeakAction(rpc.CharacterName.ToString(), dialog.Id, IATConsts.PLAYER);
-            CurrentDialogueState = ns.ToString();
 
+            CurrentDialogueState = ns.ToString();
+            
             return dialog.Utterance;
         }
         else
@@ -117,6 +117,7 @@ public class SingleCharacterDemo : MonoBehaviour
         else
         {
             d = iat.GetDialogActionById(IATConsts.AGENT, id);
+            TUC.PerformUtterance("", d.Utterance, "");
         }
 
         var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.GetMeaningName(), d.GetStylesName());
