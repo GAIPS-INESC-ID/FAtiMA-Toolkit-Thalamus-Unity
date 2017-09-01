@@ -118,6 +118,9 @@ public class SingleCharacterDemo : MonoBehaviour
         {
             d = iat.GetDialogActionById(IATConsts.AGENT, id);
             TUC.PerformUtterance("", d.Utterance, "");
+            TUC.GazeAtTarget("Person");
+            TUC.PlayAnimation("", "Anger5");
+            TUC.SetPosture("", "admiration", 0, 0);
         }
 
         var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.GetMeaningName(), d.GetStylesName());

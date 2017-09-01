@@ -23,6 +23,24 @@ public interface IFMLSpeech
     void CancelUtterance(string id);
 }
 
+public interface IPostureActions
+{
+    [XmlRpcMethod]
+    void SetPosture(string id, string posture, double percent, double decay);
+}
+
+public interface IAnimationActions
+{
+    [XmlRpcMethod]
+    void PlayAnimation(string id, string animation);
+}
+
+public interface IGazeStateActions
+{
+    [XmlRpcMethod]
+    void GazeAtTarget(string targetName);
+}
+
 public interface IFMLSpeechEvents
 {
     [XmlRpcMethod]
@@ -43,7 +61,7 @@ public interface ITUCActions
     void SentFromThalamusToUnity();
 }
 
-public interface ISMessagesRpc : IFMLSpeech, IXmlRpcProxy { }
+public interface ISMessagesRpc : IFMLSpeech, IGazeStateActions, IAnimationActions, IPostureActions, IXmlRpcProxy { }
 
 public class ThalamusListener : XmlRpcListenerService, IFMLSpeechEvents
 {
@@ -64,7 +82,7 @@ public class ThalamusListener : XmlRpcListenerService, IFMLSpeechEvents
     }
 }
 
-public class ThalamusConnector : IFMLSpeech
+public class ThalamusConnector : IFMLSpeech, IGazeStateActions, IAnimationActions, IPostureActions
 {
     private string _remoteAddress = "localhost";
 
@@ -109,7 +127,7 @@ public class ThalamusConnector : IFMLSpeech
     {
         SCD = scd;
         _remoteUri = String.Format("http://{0}:{1}/", _remoteAddress, _remotePort);
-        Debug.Log("ThalamusSueca endpoint set to " + _remoteUri);
+        Debug.Log("Thalamus endpoint set to " + _remoteUri);
         _rpcProxy = XmlRpcProxyGen.Create<ISMessagesRpc>();
         _rpcProxy.Timeout = 1000;
         _rpcProxy.Url = _remoteUri;
@@ -256,7 +274,14 @@ public class ThalamusConnector : IFMLSpeech
 
     public void PerformUtteranceWithTags(string id, string utterance, string[] tagNames, string[] tagValues)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _rpcProxy.PerformUtteranceWithTags(id, utterance, tagNames, tagValues);
+        }
+        catch (Exception e)
+        {
+            if (_printExceptions) Debug.Log("Exception: " + e.Message + (e.InnerException != null ? ": " + e.InnerException : ""));
+        }
     }
 
     public void PerformUtteranceFromLibrary(string id, string category, string subcategory, string[] tagNames, string[] tagValues)
@@ -266,6 +291,49 @@ public class ThalamusConnector : IFMLSpeech
 
     public void CancelUtterance(string id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _rpcProxy.CancelUtterance(id);
+        }
+        catch (Exception e)
+        {
+            if (_printExceptions) Debug.Log("Exception: " + e.Message + (e.InnerException != null ? ": " + e.InnerException : ""));
+        }
+    }
+
+    public void GazeAtTarget(string targetName)
+    {
+        try
+        {
+            _rpcProxy.GazeAtTarget(targetName);
+        }
+        catch (Exception e)
+        {
+            if (_printExceptions) Debug.Log("Exception: " + e.Message + (e.InnerException != null ? ": " + e.InnerException : ""));
+        }
+    }
+
+    public void PlayAnimation(string id, string animation)
+    {
+        try
+        {
+            _rpcProxy.PlayAnimation(id, animation);
+        }
+        catch (Exception e)
+        {
+            if (_printExceptions) Debug.Log("Exception: " + e.Message + (e.InnerException != null ? ": " + e.InnerException : ""));
+        }
+    }
+
+    public void SetPosture(string id, string posture, double percent, double decay)
+    {
+        try
+        {
+            _rpcProxy.SetPosture(id, posture, percent, decay);
+        }
+        catch (Exception e)
+        {
+            if (_printExceptions) Debug.Log("Exception: " + e.Message + (e.InnerException != null ? ": " + e.InnerException : ""));
+        }
     }
 }
