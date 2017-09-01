@@ -1,0 +1,62 @@
+{
+	"root":
+		{
+			"classId": 0,
+			"ScenarioName": "ConversationDemo",
+			"Description": "FAtiMA-Thalamus Integration",
+			"CharacterSources": ["Emys.rpc"],
+			"PlayerDialogues": [
+				{
+					"CurrentState": "Start",
+					"NextState": "S1",
+					"Meaning": ["-"],
+					"Style": ["-"],
+					"Utterance": "Hi there! How are you?"
+				}, 
+				{
+					"CurrentState": "End",
+					"NextState": "Start",
+					"Meaning": ["-"],
+					"Style": ["-"],
+					"Utterance": "Restart"
+				}],
+			"AgentDialogues": [
+				{
+					"CurrentState": "S1",
+					"NextState": "End",
+					"Meaning": ["-"],
+					"Style": ["-"],
+					"Utterance": "I am fine. Thank you for asking.",
+					"UtteranceId": "TTS-F30CB1464C860F4E9E090135D0164993"
+				}, 
+				{
+					"CurrentState": "Start",
+					"NextState": "Start",
+					"Meaning": ["-"],
+					"Style": ["-"],
+					"Utterance": "Hi!",
+					"UtteranceId": "TTS-AFF97160474A056E838C1F721AF01EDF"
+				}, 
+				{
+					"CurrentState": "Start",
+					"NextState": "Start",
+					"Meaning": ["-"],
+					"Style": ["-"],
+					"Utterance": "Hello!",
+					"UtteranceId": "TTS-5A8DD3AD0756A93DED72B823B19DD877"
+				}, 
+				{
+					"CurrentState": "Start",
+					"NextState": "Start",
+					"Meaning": ["-"],
+					"Style": ["-"],
+					"Utterance": "Good morning!",
+					"UtteranceId": "TTS-CCD3CFF30660D474269ABAEBB0069C46"
+				}]
+		},
+	"types": [
+		{
+			"TypeId": 0,
+			"ClassName": "IntegratedAuthoringTool.IntegratedAuthoringToolAsset, IntegratedAuthoringTool, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"
+		}]
+}

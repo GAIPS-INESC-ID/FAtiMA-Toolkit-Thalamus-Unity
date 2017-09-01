@@ -1,0 +1,23 @@
+{
+	"root":
+		{
+			"classId": 0,
+			"DefaultActionPriority": 0,
+			"ActionTendencies": 
+			[
+				{
+					"Action": "Speak([currentState], [nextState], [meaning], [style])",
+					"Target": "[x]",
+					"Conditions":
+						{
+							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], [meaning], [style]) = True"]
+						}
+				} 
+			]
+		},
+	"types": [
+		{
+			"TypeId": 0,
+			"ClassName": "EmotionalDecisionMaking.EmotionalDecisionMakingAsset, EmotionalDecisionMaking, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+		}]
+}
