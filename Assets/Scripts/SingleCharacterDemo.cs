@@ -22,12 +22,19 @@ public class SingleCharacterDemo : MonoBehaviour
     private Text AgentEmotionalStateText;
 
     [SerializeField]
+    private Button PreviousPageButton;
+
+    [SerializeField]
+    private Button NextPageButton;
+
+    [SerializeField]
     private List<Button> DialogueButtons;
 
     private IntegratedAuthoringToolAsset iat;
     private RolePlayCharacterAsset rpc;
 
     private string CurrentDialogueState;
+    private int currentPageNumber = 0; //Dialogue options
 
     private ThalamusConnector TUC;
 
@@ -67,8 +74,10 @@ public class SingleCharacterDemo : MonoBehaviour
     private void Update()
     {
         var state = rpc.GetBeliefValue(String.Format(IATConsts.DIALOGUE_STATE_PROPERTY, IATConsts.PLAYER));
+
         if (state != CurrentDialogueState)
         {
+            currentPageNumber = 0;
             CurrentDialogueState = state;
             AgentUtterance.text = DetermineAgentDialogue();
             UpdatePlayerDialogOptions();
@@ -89,7 +98,7 @@ public class SingleCharacterDemo : MonoBehaviour
                 var aux = "Mood: " + rpc.Mood + ", Emotions: [";
 
                 StringBuilder builder = new StringBuilder();
-                
+
                 var query = rpc.GetAllActiveEmotions().GroupBy(e => e.Type).Select(g => g.OrderByDescending(e => e.Intensity).First()).OrderByDescending(e => e.Intensity);
 
                 foreach (var emt in query)
@@ -99,7 +108,7 @@ public class SingleCharacterDemo : MonoBehaviour
                 aux += builder.Remove(builder.Length - 2, 2);
                 this.AgentEmotionalStateText.text = aux + "]";
             }
-            
+
             rpc.Update();
 
             yield return new WaitForSeconds(updateTime);
@@ -122,7 +131,7 @@ public class SingleCharacterDemo : MonoBehaviour
             HandleSpeakAction(rpc.CharacterName.ToString(), dialog.Id, IATConsts.PLAYER);
 
             CurrentDialogueState = ns.ToString();
-            
+
             return dialog.Utterance;
         }
         else
@@ -134,21 +143,62 @@ public class SingleCharacterDemo : MonoBehaviour
     private void UpdatePlayerDialogOptions()
     {
         var dOpt = iat.GetDialogueActionsByState(IATConsts.PLAYER, CurrentDialogueState);
+
+        var pageSize = DialogueButtons.Count();
+
+        this.UpdatePageButtons(dOpt.Count(), pageSize);
+
+        var aux = currentPageNumber * pageSize;
+
         for (int i = 0; i < DialogueButtons.Count(); i++)
         {
-            if (i >= dOpt.Count())
+            if (i + aux >= dOpt.Count())
             {
                 DialogueButtons[i].gameObject.SetActive(false);
             }
             else
             {
                 DialogueButtons[i].gameObject.SetActive(true);
-                DialogueButtons[i].GetComponentInChildren<Text>().text = dOpt.ElementAt(i).Utterance;
-                var id = dOpt.ElementAt(i).Id;
+                DialogueButtons[i].GetComponentInChildren<Text>().text = dOpt.ElementAt(i + aux).Utterance;
+                var id = dOpt.ElementAt(i+ aux).Id;
                 DialogueButtons[i].onClick.AddListener(() => OnDialogueSelected(id));
             }
         }
     }
+
+    private void UpdatePageButtons(int numOfOptions, int pageSize)
+    {
+        if (numOfOptions > pageSize * (currentPageNumber+1))
+        {
+            this.NextPageButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            this.NextPageButton.gameObject.SetActive(false);
+        }
+
+        if (currentPageNumber > 0)
+        {
+            this.PreviousPageButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            this.PreviousPageButton.gameObject.SetActive(false);
+        }
+    }
+
+    public void OnNextPage()
+    {
+        currentPageNumber++;
+        UpdatePlayerDialogOptions();
+    }
+
+    public void OnPreviousPage()
+    {
+        currentPageNumber--;
+        UpdatePlayerDialogOptions();
+    }
+
 
     public void OnDialogueSelected(Guid dialogId)
     {
@@ -166,7 +216,7 @@ public class SingleCharacterDemo : MonoBehaviour
         {
             d = iat.GetDialogActionById(IATConsts.AGENT, id);
 
-            if(TUC != null)
+            if (TUC != null)
             {
                 TUC.PerformUtterance("", d.Utterance, "");
                 TUC.GazeAtTarget("Person");
