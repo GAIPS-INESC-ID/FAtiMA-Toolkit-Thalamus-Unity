@@ -4,8 +4,10 @@ using IntegratedAuthoringTool;
 using IntegratedAuthoringTool.DTOs;
 using RolePlayCharacter;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
@@ -15,6 +17,9 @@ public class SingleCharacterDemo : MonoBehaviour
 {
     [SerializeField]
     private Text AgentUtterance;
+
+    [SerializeField]
+    private Text AgentEmotionalStateText;
 
     [SerializeField]
     private List<Button> DialogueButtons;
@@ -29,8 +34,6 @@ public class SingleCharacterDemo : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-        TUC = new ThalamusConnector(this);
-
         AssetManager.Instance.Bridge = new AssetManagerBridge();
 
         var streamingAssetsPath = Application.streamingAssetsPath;
@@ -45,6 +48,19 @@ public class SingleCharacterDemo : MonoBehaviour
         rpc = RolePlayCharacterAsset.LoadFromFile(characterSources[0].Source);
         rpc.LoadAssociatedAssets();
         iat.BindToRegistry(rpc.DynamicPropertiesRegistry);
+
+        bool thalamusOn = false;
+        bool.TryParse(rpc.GetBeliefValue("Connect(Thalamus)"), out thalamusOn);
+
+        if (thalamusOn)
+        {
+            TUC = new ThalamusConnector(this);
+        }
+
+        float updateFrequency = 1f;
+        float.TryParse(rpc.GetBeliefValue("Update(Frequency)"), out updateFrequency);
+        StartCoroutine(UpdateEmotionalState(updateFrequency));
+
     }
 
     // Update is called once per frame
@@ -58,6 +74,38 @@ public class SingleCharacterDemo : MonoBehaviour
             UpdatePlayerDialogOptions();
         }
     }
+
+
+    private IEnumerator UpdateEmotionalState(float updateTime)
+    {
+        while (true)
+        {
+            if (!rpc.GetAllActiveEmotions().Any())
+            {
+                this.AgentEmotionalStateText.text = "Mood: " + rpc.Mood + ", Emotions: []";
+            }
+            else
+            {
+                var aux = "Mood: " + rpc.Mood + ", Emotions: [";
+
+                StringBuilder builder = new StringBuilder();
+                
+                var query = rpc.GetAllActiveEmotions().GroupBy(e => e.Type).Select(g => g.OrderByDescending(e => e.Intensity).First()).OrderByDescending(e => e.Intensity);
+
+                foreach (var emt in query)
+                {
+                    builder.AppendFormat("{0}: {1:N2}, ", emt.Type, emt.Intensity);
+                }
+                aux += builder.Remove(builder.Length - 2, 2);
+                this.AgentEmotionalStateText.text = aux + "]";
+            }
+            
+            rpc.Update();
+
+            yield return new WaitForSeconds(updateTime);
+        }
+    }
+
 
     private string DetermineAgentDialogue()
     {
@@ -117,10 +165,14 @@ public class SingleCharacterDemo : MonoBehaviour
         else
         {
             d = iat.GetDialogActionById(IATConsts.AGENT, id);
-            TUC.PerformUtterance("", d.Utterance, "");
-            TUC.GazeAtTarget("Person");
-            TUC.PlayAnimation("", "Anger5");
-            TUC.SetPosture("", "admiration", 0, 0);
+
+            if(TUC != null)
+            {
+                TUC.PerformUtterance("", d.Utterance, "");
+                TUC.GazeAtTarget("Person");
+                TUC.PlayAnimation("", "Anger5");
+                TUC.SetPosture("", "admiration", 0, 0);
+            }
         }
 
         var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.GetMeaningName(), d.GetStylesName());
@@ -128,5 +180,14 @@ public class SingleCharacterDemo : MonoBehaviour
 
         rpc.Perceive(EventHelper.ActionEnd(s, dAct, t));
         rpc.Perceive(EventHelper.PropertyChange(dStateProperty, d.NextState, s));
+        //this.SaveState();
+    }
+
+    private void SaveState()
+    {
+        const string datePattern = "dd-MM-yyyy-H-mm-ss";
+        rpc.SaveToFile(Application.streamingAssetsPath
+            + "\\Logs\\" + rpc.CharacterName
+            + "-" + DateTime.Now.ToString(datePattern) + ".rpc");
     }
 }

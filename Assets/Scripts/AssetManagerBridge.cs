@@ -71,7 +71,7 @@ namespace Assets.Scripts
 
 		public void Save(string fileId, string fileData)
 		{
-			throw new InvalidOperationException();
+            File.WriteAllText(fileId, fileData);
 		}
 	}
 }
