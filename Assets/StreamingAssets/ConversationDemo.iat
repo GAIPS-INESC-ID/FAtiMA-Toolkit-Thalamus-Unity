@@ -26,57 +26,14 @@
 					"Meaning": ["-"],
 					"Style": ["-"],
 					"Utterance": "What's up dude?"
-				},
-				{
-					"CurrentState": "Start",
-					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "What's up dude 2?"
-				},
-				{
-					"CurrentState": "Start",
-					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "What's up dude 3?"
-				},
-				{
-					"CurrentState": "Start",
-					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "What's up dude 4?"
-				},
-				{
-					"CurrentState": "Start",
-					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "What's up dude 5?"
-				},
-				{
-					"CurrentState": "Start",
-					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "What's up dude 6?"
-				},
+				}, 
 				{
 					"CurrentState": "Start",
 					"NextState": "Start",
 					"Meaning": ["-"],
 					"Style": ["-"],
 					"Utterance": "Restart"
-				},
-				{
-					"CurrentState": "Start",
-					"NextState": "Start",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "Restart"
-				}
-				],
+				}],
 			"AgentDialogues": [
 				{
 					"CurrentState": "S1",
@@ -89,26 +46,18 @@
 				{
 					"CurrentState": "Start",
 					"NextState": "Start",
-					"Meaning": ["-"],
+					"Meaning": ["Var(Teste)"],
 					"Style": ["-"],
-					"Utterance": "Hi!",
-					"UtteranceId": "TTS-AFF97160474A056E838C1F721AF01EDF"
+					"Utterance": "Hello! [[Age(Self)]] Ola [[Display(Name)]] My Beautiful",
+					"UtteranceId": "TTS-887D8B59A1D6E8C0F731860F9A9AC1FB"
 				}, 
 				{
 					"CurrentState": "Start",
 					"NextState": "Start",
 					"Meaning": ["-"],
 					"Style": ["-"],
-					"Utterance": "Hello!",
-					"UtteranceId": "TTS-5A8DD3AD0756A93DED72B823B19DD877"
-				}, 
-				{
-					"CurrentState": "Start",
-					"NextState": "Start",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "Good morning!",
-					"UtteranceId": "TTS-CCD3CFF30660D474269ABAEBB0069C46"
+					"Utterance": "Hi! My name is [[Display(Name)]]",
+					"UtteranceId": "TTS-9709BF8AE9E4B1F01C6C761DFFBBEFEC"
 				}]
 		},
 	"types": [

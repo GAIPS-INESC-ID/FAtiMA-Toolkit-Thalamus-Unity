@@ -3,8 +3,7 @@
 		{
 			"classId": 0,
 			"DefaultActionPriority": 0,
-			"ActionTendencies": 
-			[
+			"ActionTendencies": [
 				{
 					"Action": "Speak([currentState], [nextState], [meaning], [style])",
 					"Target": "[x]",
@@ -12,8 +11,7 @@
 						{
 							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], [meaning], [style]) = True"]
 						}
-				} 
-			]
+				}]
 		},
 	"types": [
 		{

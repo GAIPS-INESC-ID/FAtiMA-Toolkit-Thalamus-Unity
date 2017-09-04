@@ -12,6 +12,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
 using WellFormedNames;
+using System.Text.RegularExpressions;
+
 
 public class SingleCharacterDemo : MonoBehaviour
 {
@@ -79,7 +81,15 @@ public class SingleCharacterDemo : MonoBehaviour
         {
             currentPageNumber = 0;
             CurrentDialogueState = state;
-            AgentUtterance.text = DetermineAgentDialogue();
+            var agentDialogue = DetermineAgentDialogue(); 
+            if (TUC != null)
+            {
+                TUC.PerformUtterance("", agentDialogue, "");
+                TUC.GazeAtTarget("Person");
+                TUC.PlayAnimation("", "Anger5");
+                TUC.SetPosture("", "admiration", 0, 0);
+            }
+            AgentUtterance.text = agentDialogue;
             UpdatePlayerDialogOptions();
         }
     }
@@ -118,7 +128,8 @@ public class SingleCharacterDemo : MonoBehaviour
 
     private string DetermineAgentDialogue()
     {
-        var action = rpc.Decide().FirstOrDefault();
+        var actions = rpc.Decide().ToArray(); 
+        var action = actions.FirstOrDefault();
         if (action != null && action.Key.ToString().Equals(IATConsts.DIALOG_ACTION_KEY))
         {
             Name cs = action.Parameters[0];
@@ -131,13 +142,40 @@ public class SingleCharacterDemo : MonoBehaviour
             HandleSpeakAction(rpc.CharacterName.ToString(), dialog.Id, IATConsts.PLAYER);
 
             CurrentDialogueState = ns.ToString();
-
-            return dialog.Utterance;
+            var processed = this.ReplaceVariablesInDialogue(dialog.Utterance);
+            return processed;
         }
         else
         {
             return String.Empty;
         }
+    }
+
+    //This method will replace every belief within [[ ]] by its value
+    private string ReplaceVariablesInDialogue(string dialog)
+    {
+        var tokens = Regex.Split(dialog, @"\[|\]\]");
+       
+        var result = string.Empty;
+        bool process = false;
+        foreach (var t in tokens)
+        {
+            if (process)
+            {
+                var beliefValue = rpc.GetBeliefValue(t);
+                result += beliefValue;
+                process = false;
+            }else if (t == string.Empty)
+            {
+                process = true;
+                continue;
+            }
+            else
+            {
+                result += t;
+            }
+        }
+        return result;
     }
 
     private void UpdatePlayerDialogOptions()
@@ -216,13 +254,7 @@ public class SingleCharacterDemo : MonoBehaviour
         {
             d = iat.GetDialogActionById(IATConsts.AGENT, id);
 
-            if (TUC != null)
-            {
-                TUC.PerformUtterance("", d.Utterance, "");
-                TUC.GazeAtTarget("Person");
-                TUC.PlayAnimation("", "Anger5");
-                TUC.SetPosture("", "admiration", 0, 0);
-            }
+            
         }
 
         var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.GetMeaningName(), d.GetStylesName());
@@ -230,6 +262,7 @@ public class SingleCharacterDemo : MonoBehaviour
 
         rpc.Perceive(EventHelper.ActionEnd(s, dAct, t));
         rpc.Perceive(EventHelper.PropertyChange(dStateProperty, d.NextState, s));
+        
         //this.SaveState();
     }
 

@@ -9,8 +9,10 @@
 						{
 							"SELF":
 								{
+									"Age(Emys)": "13, 1",
 									"Connect(Thalamus)": "False, 1",
 									"DialogueState(Player)": "Start, 1",
+									"Display(Name)": "Emys, 1",
 									"Update(Frequency)": "2, 1"
 								}
 						}
