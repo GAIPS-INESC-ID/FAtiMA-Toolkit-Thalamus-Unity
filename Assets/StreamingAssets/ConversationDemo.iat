@@ -7,13 +7,6 @@
 			"CharacterSources": ["Emys.rpc"],
 			"PlayerDialogues": [
 				{
-					"CurrentState": "Start",
-					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "Hi there! How are you?"
-				}, 
-				{
 					"CurrentState": "End",
 					"NextState": "Start",
 					"Meaning": ["-"],
@@ -23,16 +16,16 @@
 				{
 					"CurrentState": "Start",
 					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "What's up dude?"
+					"Meaning": [],
+					"Style": ["B", "C"],
+					"Utterance": "Hi there! How are you?"
 				}, 
 				{
 					"CurrentState": "Start",
-					"NextState": "Start",
+					"NextState": "S1",
 					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "Restart"
+					"Style": ["A", "C"],
+					"Utterance": "What's up dude?"
 				}],
 			"AgentDialogues": [
 				{
@@ -42,22 +35,6 @@
 					"Style": ["-"],
 					"Utterance": "I am fine. Thank you for asking.",
 					"UtteranceId": "TTS-F30CB1464C860F4E9E090135D0164993"
-				}, 
-				{
-					"CurrentState": "Start",
-					"NextState": "Start",
-					"Meaning": ["Var(Teste)"],
-					"Style": ["-"],
-					"Utterance": "Hello! [[Age(Self)]] Ola [[Display(Name)]] My Beautiful",
-					"UtteranceId": "TTS-887D8B59A1D6E8C0F731860F9A9AC1FB"
-				}, 
-				{
-					"CurrentState": "Start",
-					"NextState": "Start",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "Hi! My name is [[Display(Name)]]",
-					"UtteranceId": "TTS-9709BF8AE9E4B1F01C6C761DFFBBEFEC"
 				}]
 		},
 	"types": [

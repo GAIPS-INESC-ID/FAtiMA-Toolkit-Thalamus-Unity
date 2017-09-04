@@ -1,0 +1,23 @@
+{
+	"root":
+		{
+			"classId": 0,
+			"AttributionRules": [
+				{
+					"RuleName": "A1",
+					"Target": "[y]",
+					"Value": 20,
+					"Conditions":
+						{
+							"Set": ["Likes([x], [y]) = True"]
+						}
+				}],
+			"Claims": [],
+			"Conferrals": []
+		},
+	"types": [
+		{
+			"TypeId": 0,
+			"ClassName": "SocialImportance.SocialImportanceAsset, SocialImportanceAsset, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+		}]
+}

@@ -1,7 +1,7 @@
 {
 	"root":
 		{
-			"classId": 1,
+			"classId": 0,
 			"KnowledgeBase":
 				{
 					"Perspective": "Emys",
@@ -9,58 +9,30 @@
 						{
 							"SELF":
 								{
-									"Age(Emys)": "13, 1",
 									"Connect(Thalamus)": "False, 1",
 									"DialogueState(Player)": "Start, 1",
-									"Display(Name)": "Emys, 1",
-									"Update(Frequency)": "2, 1"
+									"Posture(Joy)": "joy1, 1",
+									"Reset(Emotions)": "False, 1",
+									"Update(Frequency)": "1, 1",
+									"Likes(Emys, Player)": "True, 1"
+								},
+							"SELF(Player)":
+								{
+									"Likes(Player, Emys)": "True, 1"
 								}
 						}
 				},
 			"BodyName": "Robot",
 			"VoiceName": null,
-			"EmotionalAppraisalAssetSource": null,
+			"EmotionalAppraisalAssetSource": "AppraisalRules.ea",
 			"EmotionalDecisionMakingSource": "DecisionRules.edm",
-			"SocialImportanceAssetSource": null,
+			"SocialImportanceAssetSource": "SIRules.si",
 			"CommeillFautAssetSource": null,
 			"EmotionalState":
 				{
-					"Mood": -3,
+					"Mood": 0,
 					"initialTick": 0,
-					"EmotionalPool": [
-						{
-							"Intensity": 8,
-							"Decay": 1,
-							"Threshold": 1,
-							"CauseId": 1,
-							"EventName": "Event(Action-End, Player, Insult, Emys)",
-							"EmotionType": "Admiration",
-							"Valence": "Positive",
-							"AppraisalVariables": ["PRAISEWORTHINESS"],
-							"InfluenceMood": true
-						}, 
-						{
-							"Intensity": 4,
-							"Decay": 1,
-							"Threshold": 1,
-							"CauseId": 1,
-							"EventName": "Event(Action-End, Player, Insult, Emys)",
-							"EmotionType": "Anger",
-							"Valence": "Negative",
-							"AppraisalVariables": ["DESIRABILITY", "PRAISEWORTHINESS"],
-							"InfluenceMood": true
-						}, 
-						{
-							"Intensity": 1,
-							"Decay": 1,
-							"Threshold": 1,
-							"CauseId": 1,
-							"EventName": "Event(Action-End, Player, Insult, Emys)",
-							"EmotionType": "Joy",
-							"Valence": "Positive",
-							"AppraisalVariables": ["DESIRABILITY"],
-							"InfluenceMood": true
-						}],
+					"EmotionalPool": [],
 					"AppraisalConfiguration":
 						{
 							"HalfLifeDecayConstant": 0.5,
@@ -74,17 +46,7 @@
 			"AutobiographicMemory":
 				{
 					"Tick": 0,
-					"records": [
-						{
-							"classId": 0,
-							"Id": 1,
-							"Type": "Action-End",
-							"Subject": "Player",
-							"Timestamp": 0,
-							"LinkedEmotions": ["Admiration", "Anger", "Joy"],
-							"Action": "Insult",
-							"Target": "Emys"
-						}]
+					"records": []
 				},
 			"OtherAgents":
 				{
@@ -94,10 +56,6 @@
 	"types": [
 		{
 			"TypeId": 0,
-			"ClassName": "AutobiographicMemory.AM+ActionEvent, AutobiographicMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
-		}, 
-		{
-			"TypeId": 1,
 			"ClassName": "RolePlayCharacter.RolePlayCharacterAsset, RolePlayCharacter, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"
 		}]
 }

@@ -87,7 +87,6 @@ public class SingleCharacterDemo : MonoBehaviour
                 TUC.PerformUtterance("", agentDialogue, "");
                 TUC.GazeAtTarget("Person");
                 TUC.PlayAnimation("", "Anger5");
-                TUC.SetPosture("", "admiration", 0, 0);
             }
             AgentUtterance.text = agentDialogue;
             UpdatePlayerDialogOptions();
@@ -99,9 +98,12 @@ public class SingleCharacterDemo : MonoBehaviour
     {
         while (true)
         {
+            var SIPlayerAgent = rpc.GetBeliefValue("ToM(Player, SI(SELF))");
+            var SIAgentPlayer = rpc.GetBeliefValue("SI(Player)");
+            
             if (!rpc.GetAllActiveEmotions().Any())
             {
-                this.AgentEmotionalStateText.text = "Mood: " + rpc.Mood + ", Emotions: []";
+                this.AgentEmotionalStateText.text = "Mood: " + rpc.Mood + ", Emotions: [], SI(A,P): " + SIAgentPlayer + " SI(P,A): " + SIPlayerAgent;
             }
             else
             {
@@ -109,18 +111,30 @@ public class SingleCharacterDemo : MonoBehaviour
 
                 StringBuilder builder = new StringBuilder();
 
-                var query = rpc.GetAllActiveEmotions().GroupBy(e => e.Type).Select(g => g.OrderByDescending(e => e.Intensity).First()).OrderByDescending(e => e.Intensity);
+                var query = rpc.GetAllActiveEmotions().OrderByDescending(e => e.Intensity);
 
                 foreach (var emt in query)
                 {
                     builder.AppendFormat("{0}: {1:N2}, ", emt.Type, emt.Intensity);
                 }
                 aux += builder.Remove(builder.Length - 2, 2);
-                this.AgentEmotionalStateText.text = aux + "]";
+                this.AgentEmotionalStateText.text = aux + "], SI(A,P): " + SIAgentPlayer + " SI(P,A): " + SIPlayerAgent;
             }
-
+             
             rpc.Update();
 
+            //Change Posture
+            var action = rpc.Decide().Where(a => a.Key.Equals("ChangePosture")).FirstOrDefault();
+
+            if(action != null)
+            {
+                var posture = action.Parameters[0];
+                Debug.Log("Change Posture:" + posture);
+                if (TUC != null)
+                {
+                    TUC.SetPosture("", "admiration", 0, 0);
+                }
+            }
             yield return new WaitForSeconds(updateTime);
         }
     }
@@ -128,9 +142,10 @@ public class SingleCharacterDemo : MonoBehaviour
 
     private string DetermineAgentDialogue()
     {
-        var actions = rpc.Decide().ToArray(); 
-        var action = actions.FirstOrDefault();
-        if (action != null && action.Key.ToString().Equals(IATConsts.DIALOG_ACTION_KEY))
+        var actions = rpc.Decide().ToArray();
+        var action = actions.Where(a => a.Key.ToString().Equals(IATConsts.DIALOG_ACTION_KEY)).FirstOrDefault();
+
+        if (action != null)
         {
             Name cs = action.Parameters[0];
             Name ns = action.Parameters[1];
@@ -199,6 +214,7 @@ public class SingleCharacterDemo : MonoBehaviour
                 DialogueButtons[i].gameObject.SetActive(true);
                 DialogueButtons[i].GetComponentInChildren<Text>().text = dOpt.ElementAt(i + aux).Utterance;
                 var id = dOpt.ElementAt(i+ aux).Id;
+                DialogueButtons[i].onClick.RemoveAllListeners();
                 DialogueButtons[i].onClick.AddListener(() => OnDialogueSelected(id));
             }
         }
@@ -249,6 +265,15 @@ public class SingleCharacterDemo : MonoBehaviour
         if (s.Equals(IATConsts.PLAYER))
         {
             d = iat.GetDialogActionById(IATConsts.PLAYER, id);
+
+            bool resetEmotions;
+            bool.TryParse(rpc.GetBeliefValue("Reset(Emotions)"), out resetEmotions);
+            if (resetEmotions)
+            {
+                var currentMood = rpc.Mood;
+                rpc.ResetEmotionalState();
+                rpc.Mood = currentMood;
+            }
         }
         else
         {

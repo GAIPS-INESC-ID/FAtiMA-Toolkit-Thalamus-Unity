@@ -11,6 +11,13 @@
 						{
 							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], [meaning], [style]) = True"]
 						}
+				}, 
+				{
+					"Action": "ChangePosture([p])",
+					"Conditions":
+						{
+							"Set": ["StrongestEmotion(SELF) = [e]", "Posture([e]) = [p]"]
+						}
 				}]
 		},
 	"types": [
