@@ -124,7 +124,8 @@ public class SingleCharacterDemo : MonoBehaviour
             rpc.Update();
 
             //Change Posture
-            var action = rpc.Decide().Where(a => a.Key.Equals("ChangePosture")).FirstOrDefault();
+            var actions = rpc.Decide().ToArray();
+            var action = actions.Where(a => a.Key.ToString().Equals("ChangePosture")).FirstOrDefault();
 
             if(action != null)
             {
@@ -132,7 +133,7 @@ public class SingleCharacterDemo : MonoBehaviour
                 Debug.Log("Change Posture:" + posture);
                 if (TUC != null)
                 {
-                    TUC.SetPosture("", "admiration", 0, 0);
+                    TUC.SetPosture("", posture.ToString(), 0, 0);
                 }
             }
             yield return new WaitForSeconds(updateTime);
