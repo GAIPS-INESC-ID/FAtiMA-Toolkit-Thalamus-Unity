@@ -5,12 +5,13 @@
 			"DefaultActionPriority": 0,
 			"ActionTendencies": [
 				{
-					"Action": "Speak([currentState], [nextState], [meaning], [style])",
+					"Action": "Speak([currentState], [nextState], M(SIConf(High), SIClaim([claim-value])), [style])",
 					"Target": "[x]",
 					"Conditions":
 						{
-							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], [meaning], [style]) = True"]
-						}
+							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], M(SIConf(High), SIClaim([claim-value])), [style]) = True", "SI([x]) >= SIThreshold(High)", "ToM(Player, SI(Self)) >= SIThreshold([claim-value])"]
+						},
+					"Priority": 3
 				}, 
 				{
 					"Action": "ChangePosture([p])",

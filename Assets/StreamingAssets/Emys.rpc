@@ -1,7 +1,7 @@
 {
 	"root":
 		{
-			"classId": 1,
+			"classId": 0,
 			"KnowledgeBase":
 				{
 					"Perspective": "Emys",
@@ -9,10 +9,14 @@
 						{
 							"SELF":
 								{
+									"Boss(Emys)": "Player, 1",
+									"Configuration(Log)": "True, 1",
 									"Connect(Thalamus)": "False, 1",
 									"DialogueState(Player)": "Start, 1",
 									"Posture(Joy)": "joy1, 1",
 									"Reset(Emotions)": "False, 1",
+									"SIThreshold(High)": "20, 1",
+									"SIThreshold(Low)": "11, 1",
 									"Update(Frequency)": "1, 1",
 									"Likes(Emys, Player)": "True, 1"
 								},
@@ -32,18 +36,7 @@
 				{
 					"Mood": 1,
 					"initialTick": 0,
-					"EmotionalPool": [
-						{
-							"Intensity": 1,
-							"Decay": 1,
-							"Threshold": 1,
-							"CauseId": 2,
-							"EventName": "Event(Action-End, Player, Kick, Emys)",
-							"EmotionType": "Joy",
-							"Valence": "Positive",
-							"AppraisalVariables": ["DESIRABILITY"],
-							"InfluenceMood": true
-						}],
+					"EmotionalPool": [],
 					"AppraisalConfiguration":
 						{
 							"HalfLifeDecayConstant": 0.5,
@@ -57,17 +50,7 @@
 			"AutobiographicMemory":
 				{
 					"Tick": 0,
-					"records": [
-						{
-							"classId": 0,
-							"Id": 2,
-							"Type": "Action-End",
-							"Subject": "Player",
-							"Timestamp": 0,
-							"LinkedEmotions": ["Joy"],
-							"Action": "Kick",
-							"Target": "Emys"
-						}]
+					"records": []
 				},
 			"OtherAgents":
 				{
@@ -77,10 +60,6 @@
 	"types": [
 		{
 			"TypeId": 0,
-			"ClassName": "AutobiographicMemory.AM+ActionEvent, AutobiographicMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
-		}, 
-		{
-			"TypeId": 1,
 			"ClassName": "RolePlayCharacter.RolePlayCharacterAsset, RolePlayCharacter, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"
 		}]
 }

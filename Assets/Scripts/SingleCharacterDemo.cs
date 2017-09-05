@@ -288,8 +288,13 @@ public class SingleCharacterDemo : MonoBehaviour
 
         rpc.Perceive(EventHelper.ActionEnd(s, dAct, t));
         rpc.Perceive(EventHelper.PropertyChange(dStateProperty, d.NextState, s));
-        
-        //this.SaveState();
+
+        bool log;
+        bool.TryParse(rpc.GetBeliefValue("Configuration(Log)"), out log);
+        if (log)
+        {
+            this.SaveState();
+        }
     }
 
     private void SaveState()

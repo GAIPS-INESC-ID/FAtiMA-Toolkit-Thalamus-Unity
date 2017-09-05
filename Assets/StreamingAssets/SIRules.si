@@ -4,12 +4,30 @@
 			"classId": 0,
 			"AttributionRules": [
 				{
-					"RuleName": "A1",
-					"Target": "[y]",
-					"Value": 20,
+					"RuleName": "2",
+					"Target": "[x]",
+					"Value": 10,
 					"Conditions":
 						{
-							"Set": ["Likes([x], [y]) = True"]
+							"Set": ["Likes(SELF, [x]) = True"]
+						}
+				}, 
+				{
+					"RuleName": "New Attribution Rule",
+					"Target": "[x]",
+					"Value": 15,
+					"Conditions":
+						{
+							"Set": ["Boss(SELF) = [x]"]
+						}
+				}, 
+				{
+					"RuleName": "EventTest",
+					"Target": "[t]",
+					"Value": 1,
+					"Conditions":
+						{
+							"Set": ["EventId(Action-End, Self, *, [t]) = [id]"]
 						}
 				}],
 			"Claims": [],

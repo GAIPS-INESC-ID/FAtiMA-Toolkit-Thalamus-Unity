@@ -16,22 +16,22 @@
 				{
 					"CurrentState": "Start",
 					"NextState": "S1",
-					"Meaning": [],
-					"Style": ["B", "C"],
+					"Meaning": ["PC(A(B))"],
+					"Style": ["-"],
 					"Utterance": "Hi there! How are you?"
 				}, 
 				{
 					"CurrentState": "Start",
 					"NextState": "S1",
-					"Meaning": ["-"],
-					"Style": ["A", "C"],
+					"Meaning": ["SIClaim(High)", "SIConf(Low)"],
+					"Style": ["-"],
 					"Utterance": "What's up dude?"
 				}],
 			"AgentDialogues": [
 				{
 					"CurrentState": "S1",
 					"NextState": "End",
-					"Meaning": ["-"],
+					"Meaning": ["SIConf(High)", "SIClaim(Low)"],
 					"Style": ["-"],
 					"Utterance": "I am fine. Thank you for asking.",
 					"UtteranceId": "TTS-F30CB1464C860F4E9E090135D0164993"
