@@ -8,19 +8,19 @@
 					"AppraisalWeight": 1,
 					"Rules": [
 						{
-							"EventName": "Event(Action-End, [s], Speak(*, *, M(SIConf([val]), SIClaim([claim])), *), SELF)",
+							"EventName": "Event(Action-End, [s], Speak(*, *, M(SIConf([conf]), SIClaim([claim])), *), SELF)",
 							"Conditions":
 								{
-									"Set": ["SI([s]) < SIThreshold([claim])"]
+									"Set": ["SIThreshold([claim]) > SI([s])"]
 								},
 							"Desirability": -3,
-							"Praiseworthiness": -4
+							"Praiseworthiness": -3
 						}, 
 						{
-							"EventName": "Event(Action-End, [s], Speak(*, *, M(SIConf([val]), SIClaim([claim])), *), SELF)",
+							"EventName": "Event(Action-End, [s], Speak(*, *, M(SIConf([conf]), SIClaim([claim])), *), SELF)",
 							"Conditions":
 								{
-									"Set": ["SI([s]) < SIThreshold([val])"]
+									"Set": ["SIThreshold([conf]) > ToM(Player, SI(SELF))"]
 								},
 							"Desirability": 3,
 							"Praiseworthiness": 3
