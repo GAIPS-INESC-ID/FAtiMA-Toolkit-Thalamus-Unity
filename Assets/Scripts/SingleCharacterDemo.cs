@@ -13,7 +13,7 @@ using UnityEngine.UI;
 using Utilities;
 using WellFormedNames;
 using System.Text.RegularExpressions;
-
+using UnityEngine.SceneManagement;
 
 public class SingleCharacterDemo : MonoBehaviour
 {
@@ -40,6 +40,19 @@ public class SingleCharacterDemo : MonoBehaviour
 
     private ThalamusConnector TUC;
 
+    private bool configConnectThalamus;
+    private float configurationUpdateFrequency;
+    private bool configResetEmotions;
+    private bool configLog;
+
+    private void LoadConfiguration(RolePlayCharacterAsset rpc)
+    {
+        bool.TryParse(rpc.GetBeliefValue("Configuration(ConnectThalamus)"), out configConnectThalamus);
+        float.TryParse(rpc.GetBeliefValue("Configuration(UpdateFrequency)"), out configurationUpdateFrequency);
+        bool.TryParse(rpc.GetBeliefValue("Configuration(ResetEmotions)"), out configResetEmotions);
+        bool.TryParse(rpc.GetBeliefValue("Configuration(Log)"), out configLog);
+    }
+
     // Use this for initialization
     private void Start()
     {
@@ -50,7 +63,6 @@ public class SingleCharacterDemo : MonoBehaviour
 #if UNITY_EDITOR || UNITY_STANDALONE
         streamingAssetsPath = "file://" + streamingAssetsPath;
 #endif
-
         iat = IntegratedAuthoringToolAsset.LoadFromFile("ConversationDemo.iat");
         var characterSources = iat.GetAllCharacterSources().ToList();
 
@@ -58,18 +70,13 @@ public class SingleCharacterDemo : MonoBehaviour
         rpc.LoadAssociatedAssets();
         iat.BindToRegistry(rpc.DynamicPropertiesRegistry);
 
-        bool thalamusOn = false;
-        bool.TryParse(rpc.GetBeliefValue("Connect(Thalamus)"), out thalamusOn);
-
-        if (thalamusOn)
+        this.LoadConfiguration(rpc);
+        if (configConnectThalamus)
         {
             TUC = new ThalamusConnector(this);
         }
 
-        float updateFrequency = 1f;
-        float.TryParse(rpc.GetBeliefValue("Update(Frequency)"), out updateFrequency);
-        StartCoroutine(UpdateEmotionalState(updateFrequency));
-
+        StartCoroutine(UpdateEmotionalState(configurationUpdateFrequency));
     }
 
     // Update is called once per frame
@@ -82,11 +89,9 @@ public class SingleCharacterDemo : MonoBehaviour
             currentPageNumber = 0;
             CurrentDialogueState = state;
             var agentDialogue = DetermineAgentDialogue(); 
-            if (TUC != null)
+            if (TUC != null && !string.IsNullOrEmpty(agentDialogue))
             {
                 TUC.PerformUtterance("", agentDialogue, "");
-                TUC.GazeAtTarget("Person");
-                TUC.PlayAnimation("", "Anger5");
             }
             AgentUtterance.text = agentDialogue;
             UpdatePlayerDialogOptions();
@@ -130,10 +135,9 @@ public class SingleCharacterDemo : MonoBehaviour
             if(action != null)
             {
                 var posture = action.Parameters[0];
-                Debug.Log("Change Posture:" + posture);
                 if (TUC != null)
                 {
-                    TUC.SetPosture("", posture.ToString(), 0, 0);
+                    TUC.SetPosture("", posture.ToString(), 1, 0);
                 }
             }
             yield return new WaitForSeconds(updateTime);
@@ -197,6 +201,9 @@ public class SingleCharacterDemo : MonoBehaviour
     private void UpdatePlayerDialogOptions()
     {
         var dOpt = iat.GetDialogueActionsByState(IATConsts.PLAYER, CurrentDialogueState);
+        var additional = iat.GetDialogueActionsByState(IATConsts.PLAYER, "Any");
+
+        dOpt = dOpt.Concat(additional);
 
         var pageSize = DialogueButtons.Count();
 
@@ -267,9 +274,14 @@ public class SingleCharacterDemo : MonoBehaviour
         {
             d = iat.GetDialogActionById(IATConsts.PLAYER, id);
 
-            bool resetEmotions;
-            bool.TryParse(rpc.GetBeliefValue("Reset(Emotions)"), out resetEmotions);
-            if (resetEmotions)
+            if (d.Utterance.Contains("Restart"))
+            {
+                StopAllCoroutines();
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                return;
+            }
+
+            if (configResetEmotions)
             {
                 var currentMood = rpc.Mood;
                 rpc.ResetEmotionalState();
@@ -279,8 +291,6 @@ public class SingleCharacterDemo : MonoBehaviour
         else
         {
             d = iat.GetDialogActionById(IATConsts.AGENT, id);
-
-            
         }
 
         var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.GetMeaningName(), d.GetStylesName());
@@ -289,9 +299,7 @@ public class SingleCharacterDemo : MonoBehaviour
         rpc.Perceive(EventHelper.ActionEnd(s, dAct, t));
         rpc.Perceive(EventHelper.PropertyChange(dStateProperty, d.NextState, s));
 
-        bool log;
-        bool.TryParse(rpc.GetBeliefValue("Configuration(Log)"), out log);
-        if (log)
+        if (configLog)
         {
             this.SaveState();
         }

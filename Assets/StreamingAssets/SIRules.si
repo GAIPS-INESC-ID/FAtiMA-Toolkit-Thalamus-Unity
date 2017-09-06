@@ -4,30 +4,30 @@
 			"classId": 0,
 			"AttributionRules": [
 				{
-					"RuleName": "2",
-					"Target": "[x]",
-					"Value": 10,
-					"Conditions":
-						{
-							"Set": ["Likes(SELF, [x]) = True"]
-						}
-				}, 
-				{
-					"RuleName": "New Attribution Rule",
-					"Target": "[x]",
-					"Value": 15,
-					"Conditions":
-						{
-							"Set": ["Boss(SELF) = [x]"]
-						}
-				}, 
-				{
-					"RuleName": "EventTest",
+					"RuleName": "Feeling Admiration",
 					"Target": "[t]",
-					"Value": 1,
+					"Value": 20,
 					"Conditions":
 						{
-							"Set": ["EventId(Action-End, Self, *, [t]) = [id]"]
+							"Set": ["StrongestAttributionEmotion(SELF) = Admiration"]
+						}
+				}, 
+				{
+					"RuleName": "Liking",
+					"Target": "[t]",
+					"Value": 20,
+					"Conditions":
+						{
+							"Set": ["Likes(SELF, [t]) = True"]
+						}
+				}, 
+				{
+					"RuleName": "Feeling Reproach",
+					"Target": "[t]",
+					"Value": -10,
+					"Conditions":
+						{
+							"Set": ["StrongestAttributionEmotion(SELF) = Reproach"]
 						}
 				}],
 			"Claims": [],
@@ -36,6 +36,6 @@
 	"types": [
 		{
 			"TypeId": 0,
-			"ClassName": "SocialImportance.SocialImportanceAsset, SocialImportanceAsset, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+			"ClassName": "SocialImportance.SocialImportanceAsset, SocialImportanceAsset, Version=1.5.0.0, Culture=neutral, PublicKeyToken=null"
 		}]
 }

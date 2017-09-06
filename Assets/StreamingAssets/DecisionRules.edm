@@ -17,7 +17,7 @@
 					"Action": "ChangePosture([p])",
 					"Conditions":
 						{
-							"Set": ["StrongestEmotion(SELF) = [e]", "Posture([e]) = [p]"]
+							"Set": ["StrongestEmotion(SELF) = [e]", "Configuration(Posture, [e]) = [p]"]
 						}
 				}]
 		},

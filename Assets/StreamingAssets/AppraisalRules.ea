@@ -8,20 +8,22 @@
 					"AppraisalWeight": 1,
 					"Rules": [
 						{
-							"EventName": "Event(Action-End, [subject], Speak(*, *, *, [style]), SELF)",
+							"EventName": "Event(Action-End, [s], Speak(*, *, M(SIConf([val]), SIClaim([claim])), *), SELF)",
 							"Conditions":
 								{
-									"Set": ["HasLiteral(B, [style]) = True"]
+									"Set": ["SI([s]) < SIThreshold([claim])"]
 								},
-							"Desirability": 5
+							"Desirability": -3,
+							"Praiseworthiness": -4
 						}, 
 						{
-							"EventName": "Event(Action-End, [subject], Speak(*, *, *, [style]), SELF)",
+							"EventName": "Event(Action-End, [s], Speak(*, *, M(SIConf([val]), SIClaim([claim])), *), SELF)",
 							"Conditions":
 								{
-									"Set": ["HasLiteral(A, [style]) = True"]
+									"Set": ["SI([s]) < SIThreshold([val])"]
 								},
-							"Desirability": -5
+							"Desirability": 3,
+							"Praiseworthiness": 3
 						}]
 				},
 			"EmotionDispositions": [
