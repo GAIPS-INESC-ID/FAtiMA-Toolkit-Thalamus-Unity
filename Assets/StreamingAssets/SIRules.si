@@ -23,7 +23,7 @@
 				}, 
 				{
 					"RuleName": "Feeling Reproach",
-					"Target": "[t]",
+					"Target": "[x]",
 					"Value": -10,
 					"Conditions":
 						{

@@ -9,16 +9,23 @@
 						{
 							"SELF":
 								{
-									"Configuration(ConnectThalamus)": "True, 1",
+									"Configuration(ConnectThalamus)": "False, 1",
 									"Configuration(Log)": "False, 1",
 									"Configuration(ResetEmotions)": "False, 1",
 									"Configuration(UpdateFrequency)": "1, 1",
 									"DialogueState(Player)": "Start, 1",
+									"Favourite(Movie)": "Terminator, 1",
 									"SIValue(High)": "30, 1",
 									"SIValue(Low)": "1, 1",
 									"SIValue(Med)": "15, 1",
 									"Configuration(Posture, Admiration)": "admiration, 1",
-									"Configuration(Posture, Reproach)": "reproach, 1",
+									"Configuration(Posture, Anger)": "anger, 1",
+									"Configuration(Posture, Distress)": "disappointment, 1",
+									"Configuration(Posture, Gratitude)": "gratitude, 1",
+									"Configuration(Posture, Joy)": "joy, 1",
+									"Configuration(Posture, Pride)": "pride, 1",
+									"Configuration(Posture, Reproach)": "contempt, 1",
+									"Configuration(Posture, Shame)": "shame, 1",
 									"Likes(Emys, Player)": "True, 1"
 								},
 							"SELF(Player)":

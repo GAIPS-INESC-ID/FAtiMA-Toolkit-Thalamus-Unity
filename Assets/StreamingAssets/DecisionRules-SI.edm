@@ -14,6 +14,24 @@
 					"Priority": 3
 				}, 
 				{
+					"Action": "Speak([currentState], [nextState], M(SIConf(Mid), SIClaim([claim-value])), [style])",
+					"Target": "[x]",
+					"Conditions":
+						{
+							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], M(SIConf(Mid), SIClaim([claim-value])), [style]) = True", "SI([x]) >= SIThreshold(Mid)", "ToM(Player, SI(Self)) >= SIThreshold([claim-value])"]
+						},
+					"Priority": 2
+				}, 
+				{
+					"Action": "Speak([currentState], [nextState], M(SIConf(Low), SIClaim([claim-value])), [style])",
+					"Target": "[x]",
+					"Conditions":
+						{
+							"Set": ["DialogueState([x]) = [currentState]", "ValidDialogue([currentState], [nextState], M(SIConf(Low), SIClaim([claim-value])), [style]) = True", "SI([x]) >= SIThreshold(Low)", "ToM(Player, SI(Self)) >= SIThreshold([claim-value])"]
+						},
+					"Priority": 1
+				}, 
+				{
 					"Action": "ChangePosture([p])",
 					"Conditions":
 						{
