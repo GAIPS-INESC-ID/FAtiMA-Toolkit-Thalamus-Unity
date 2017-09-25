@@ -9,7 +9,7 @@
 					"Target": "[x]",
 					"Conditions":
 						{
-							"Set": ["DialogueState([x]) = [cs]", "ValidDialogue([cs], [ns], [m], [s]) = True"]
+							"Set": ["Has(Floor) = SELF", "DialogueState([x]) = [cs]", "ValidDialogue([cs], [ns], [m], [s]) = True"]
 						},
 					"Priority": 1
 				}]

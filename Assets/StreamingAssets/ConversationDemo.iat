@@ -2,66 +2,62 @@
 	"root":
 		{
 			"classId": 0,
-			"ScenarioName": "ConversationDemo",
-			"Description": "FAtiMA-Thalamus Integration",
-			"CharacterSources": ["Emys.rpc"],
-			"PlayerDialogues": [
+			"ScenarioName": "Test",
+			"Description": null,
+			"CharacterSources": ["Emys.rpc", "Player.rpc"],
+			"Dialogues": [
 				{
 					"CurrentState": "Any",
 					"NextState": "Start",
-					"Meaning": ["-"],
-					"Style": ["-"],
-					"Utterance": "Restart"
+					"Meaning": "-",
+					"Style": "-",
+					"Utterance": "Restart",
+					"UtteranceId": "TTS-8A7EF1C3E82395341B7000B79C239EB4"
 				}, 
 				{
 					"CurrentState": "Start",
 					"NextState": "Greeting",
-					"Meaning": ["SIConf(Low)", "SIClaim(High)"],
-					"Style": ["-"],
-					"Utterance": "What's up dude?"
+					"Meaning": "M(SIConf(Low), SIClaim(High))",
+					"Style": "-",
+					"Utterance": "What's up dude?",
+					"UtteranceId": "TTS-26F4986905FFDF6D48734070B3B70E01"
 				}, 
 				{
 					"CurrentState": "Start",
 					"NextState": "Greeting",
-					"Meaning": ["SIConf(Mid)", "SIClaim(Low)"],
-					"Style": ["-"],
-					"Utterance": "Hi Emys! How are you?"
-				}, 
-				{
-					"CurrentState": "Start",
-					"NextState": "Greeting",
-					"Meaning": ["SIConf(Mid)", "SIClaim(Low)"],
-					"Style": ["-"],
-					"Utterance": "Hi! How are you?"
-				}, 
-				{
-					"CurrentState": "Conversation",
-					"NextState": "MovieQuestion",
-					"Meaning": ["SIConf(Mid)", "SIClaim(Low)"],
-					"Style": ["-"],
-					"Utterance": "What is your favorite movie?"
-				}],
-			"AgentDialogues": [
-				{
-					"CurrentState": "MovieQuestion",
-					"NextState": "Conversation",
-					"Meaning": ["SIConf(Mid)", "SIClaim(Low)"],
-					"Style": ["-"],
-					"Utterance": "My favourite movie is [[Favourite(Movie)]]",
-					"UtteranceId": "TTS-38F22D99B4996B2E341634FA4D5AA1FC"
+					"Meaning": "M(SIConf(Mid), SIClaim(Low))",
+					"Style": "-",
+					"Utterance": "Hi Emys! How are you?",
+					"UtteranceId": "TTS-A2D8D707DCB1D5F2EDC2FC2476067F4C"
 				}, 
 				{
 					"CurrentState": "Greeting",
-					"NextState": "Conversation",
-					"Meaning": ["SIConf(Low)", "SIClaim(Low)"],
-					"Style": ["-"],
-					"Utterance": "I am fine thank you for asking",
-					"UtteranceId": "TTS-307127D83A54168C5A0CCB18D8593C62"
+					"NextState": "ConversationStart",
+					"Meaning": "-",
+					"Style": "-",
+					"Utterance": "I am fine! Thank you for asking",
+					"UtteranceId": "TTS-7616E4745E512DCBC7AD877F4BABCDEB"
+				}, 
+				{
+					"CurrentState": "Start",
+					"NextState": "Greeting",
+					"Meaning": "M(SIConf(Mid), SIClaim(Low))",
+					"Style": "-",
+					"Utterance": "Hi! How are you?",
+					"UtteranceId": "TTS-F540CDC905131A9D5D99B20913468332"
+				}, 
+				{
+					"CurrentState": "ConversationStart",
+					"NextState": "FavouriteMovie",
+					"Meaning": "-",
+					"Style": "-",
+					"Utterance": "What is your favorite movie?",
+					"UtteranceId": "TTS-4E0A2788004478F6614D9C31F78C42DD"
 				}]
 		},
 	"types": [
 		{
 			"TypeId": 0,
-			"ClassName": "IntegratedAuthoringTool.IntegratedAuthoringToolAsset, IntegratedAuthoringTool, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"
+			"ClassName": "IntegratedAuthoringTool.IntegratedAuthoringToolAsset, IntegratedAuthoringTool, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null"
 		}]
 }

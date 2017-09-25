@@ -6,7 +6,14 @@
 			"AppraisalRules":
 				{
 					"AppraisalWeight": 1,
-					"Rules": []
+					"Rules": [
+						{
+							"EventName": "Event(Action-End, *, *, *)",
+							"Conditions":
+								{
+									"Set": ["True = [x]"]
+								}
+						}]
 				},
 			"EmotionDispositions": [
 				{

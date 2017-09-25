@@ -1,7 +1,7 @@
 {
 	"root":
 		{
-			"classId": 0,
+			"classId": 1,
 			"KnowledgeBase":
 				{
 					"Perspective": "Emys",
@@ -13,8 +13,8 @@
 									"Configuration(Log)": "False, 1",
 									"Configuration(ResetEmotions)": "False, 1",
 									"Configuration(UpdateFrequency)": "1, 1",
-									"DialogueState(Player)": "Start, 1",
-									"Favourite(Movie)": "Terminator, 1",
+									"DialogueState(Player)": "None, 1",
+									"Has(Floor)": "Player, 1",
 									"SIValue(High)": "30, 1",
 									"SIValue(Low)": "1, 1",
 									"SIValue(Med)": "15, 1",
@@ -26,6 +26,7 @@
 									"Configuration(Posture, Pride)": "pride, 1",
 									"Configuration(Posture, Reproach)": "contempt, 1",
 									"Configuration(Posture, Shame)": "shame, 1",
+									"Favourite(Movie, Frederico)": "Terminator, 1",
 									"Likes(Emys, Player)": "True, 1"
 								},
 							"SELF(Player)":
@@ -36,15 +37,26 @@
 				},
 			"BodyName": "",
 			"VoiceName": null,
-			"EmotionalAppraisalAssetSource": "AppraisalRules-Suspect.ea",
+			"EmotionalAppraisalAssetSource": "teste2.ea",
 			"EmotionalDecisionMakingSource": "RandomSpeak.edm",
 			"SocialImportanceAssetSource": "SIRules.si",
 			"CommeillFautAssetSource": null,
 			"EmotionalState":
 				{
-					"Mood": -3,
+					"Mood": -4,
 					"initialTick": 0,
-					"EmotionalPool": [],
+					"EmotionalPool": [
+						{
+							"Intensity": 5,
+							"Decay": 1,
+							"Threshold": 1,
+							"CauseId": 1,
+							"EventName": "Event(Action-End, Player, Kick, Emys)",
+							"EmotionType": "Distress",
+							"Valence": "Negative",
+							"AppraisalVariables": ["DESIRABILITY"],
+							"InfluenceMood": true
+						}],
 					"AppraisalConfiguration":
 						{
 							"HalfLifeDecayConstant": 0.5,
@@ -58,7 +70,16 @@
 			"AutobiographicMemory":
 				{
 					"Tick": 0,
-					"records": []
+					"records": [
+						{
+							"classId": 0,
+							"Id": 1,
+							"Type": "Action-Start",
+							"Subject": "Player",
+							"Timestamp": 0,
+							"Action": "Kick(Strong)",
+							"Target": "Emys"
+						}]
 				},
 			"OtherAgents":
 				{
@@ -68,6 +89,10 @@
 	"types": [
 		{
 			"TypeId": 0,
+			"ClassName": "AutobiographicMemory.AM+ActionEvent, AutobiographicMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+		}, 
+		{
+			"TypeId": 1,
 			"ClassName": "RolePlayCharacter.RolePlayCharacterAsset, RolePlayCharacter, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"
 		}]
 }

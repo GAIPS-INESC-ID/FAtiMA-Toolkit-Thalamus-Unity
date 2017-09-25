@@ -33,10 +33,11 @@ public class SingleCharacterDemo : MonoBehaviour
     private List<Button> DialogueButtons;
 
     private IntegratedAuthoringToolAsset iat;
-    private RolePlayCharacterAsset rpc;
+    private RolePlayCharacterAsset agentRPC;
+    private RolePlayCharacterAsset playerRPC;
 
-    private string CurrentDialogueState;
     private int currentPageNumber = 0; //Dialogue options
+    private string agentDialogue;
 
     private ThalamusConnector TUC;
 
@@ -44,6 +45,8 @@ public class SingleCharacterDemo : MonoBehaviour
     private float configurationUpdateFrequency;
     private bool configResetEmotions;
     private bool configLog;
+    
+    private List<DialogueStateActionDTO> playerDialogues;
 
     private void LoadConfiguration(RolePlayCharacterAsset rpc)
     {
@@ -66,57 +69,77 @@ public class SingleCharacterDemo : MonoBehaviour
         iat = IntegratedAuthoringToolAsset.LoadFromFile("ConversationDemo.iat");
         var characterSources = iat.GetAllCharacterSources().ToList();
 
-        rpc = RolePlayCharacterAsset.LoadFromFile(characterSources[0].Source);
-        rpc.LoadAssociatedAssets();
-        iat.BindToRegistry(rpc.DynamicPropertiesRegistry);
-
-        this.LoadConfiguration(rpc);
+        //AGENT
+        agentRPC = RolePlayCharacterAsset.LoadFromFile(characterSources[0].Source);
+        agentRPC.LoadAssociatedAssets();
+        iat.BindToRegistry(agentRPC.DynamicPropertiesRegistry);
+        this.LoadConfiguration(agentRPC);
         if (configConnectThalamus)
         {
             TUC = new ThalamusConnector(this);
         }
 
+        //PLAYER
+        playerRPC = RolePlayCharacterAsset.LoadFromFile(characterSources[1].Source);
+        playerRPC.LoadAssociatedAssets();
+        iat.BindToRegistry(playerRPC.DynamicPropertiesRegistry);
+
+        playerDialogues = DeterminePlayerDialogues();
+        UpdatePlayerDialogOptions(true);
+        
+        AgentUtterance.text = String.Empty;
+
         StartCoroutine(UpdateEmotionalState(configurationUpdateFrequency));
+        StartCoroutine(DetermineAgentDialogue(0.2f));
+        StartCoroutine(ChangePosture(0.2f));
+    }
+
+    private List<DialogueStateActionDTO> DeterminePlayerDialogues()
+    {
+        var actions = playerRPC.Decide().ToArray();
+        var dOpt = new List<DialogueStateActionDTO>();
+        foreach (var action in actions)
+        {
+            if (action.Key.ToString().Equals(IATConsts.DIALOG_ACTION_KEY))
+            {
+                Name cs = action.Parameters[0];
+                Name ns = action.Parameters[1];
+                Name m = action.Parameters[2];
+                Name s = action.Parameters[3];
+                var dialogs = iat.GetDialogueActions(cs, ns, m, s);
+                dOpt.AddRange(dialogs);
+            }
+        }
+        dOpt = dOpt.Distinct().ToList();
+        var additional = iat.GetDialogueActionsByState("Any");
+        dOpt.AddRange(additional);
+        return dOpt;
     }
 
     // Update is called once per frame
     private void Update()
     {
-        var state = rpc.GetBeliefValue(String.Format(IATConsts.DIALOGUE_STATE_PROPERTY, IATConsts.PLAYER));
-
-        if (state != CurrentDialogueState)
-        {
-            currentPageNumber = 0;
-            CurrentDialogueState = state;
-            var agentDialogue = DetermineAgentDialogue(); 
-            if (TUC != null && !string.IsNullOrEmpty(agentDialogue))
-            {
-                TUC.PerformUtterance("", agentDialogue, "");
-            }
-            AgentUtterance.text = agentDialogue;
-            UpdatePlayerDialogOptions();
-        }
     }
 
-
+    #region Coroutines
     private IEnumerator UpdateEmotionalState(float updateTime)
     {
         while (true)
         {
-            var SIPlayerAgent = rpc.GetBeliefValue("ToM(Player, SI(SELF))");
-            var SIAgentPlayer = rpc.GetBeliefValue("SI(Player)");
-            
-            if (!rpc.GetAllActiveEmotions().Any())
+            var SIPlayerAgent = agentRPC.GetBeliefValue("ToM(Player, SI(SELF))");
+            var SIAgentPlayer = agentRPC.GetBeliefValue("SI(Player)");
+
+            if (!agentRPC.GetAllActiveEmotions().Any())
             {
-                this.AgentEmotionalStateText.text = "Mood: " + rpc.Mood + ", Emotions: [], SI(A,P): " + SIAgentPlayer + " SI(P,A): " + SIPlayerAgent;
+                this.AgentEmotionalStateText.text = "Mood: " + agentRPC.Mood + ", Emotions: [], SI(A,P): " + SIAgentPlayer + " SI(P,A): " + SIPlayerAgent;
             }
             else
             {
-                var aux = "Mood: " + rpc.Mood + ", Emotions: [";
+                var aux = "Mood: " + agentRPC.Mood + ", Emotions: [";
 
                 StringBuilder builder = new StringBuilder();
 
-                var query = rpc.GetAllActiveEmotions().OrderByDescending(e => e.Intensity);
+                var query = agentRPC.GetAllActiveEmotions().OrderByDescending(e => e.Intensity);
 
                 foreach (var emt in query)
                 {
@@ -125,19 +148,31 @@ public class SingleCharacterDemo : MonoBehaviour
                 aux += builder.Remove(builder.Length - 2, 2);
                 this.AgentEmotionalStateText.text = aux + "], SI(A,P): " + SIAgentPlayer + " SI(P,A): " + SIPlayerAgent;
             }
-             
-            rpc.Update();
 
+            agentRPC.Update();
+
+
+            yield return new WaitForSeconds(updateTime);
+        }
+    }
+
+    private IEnumerator ChangePosture(float updateTime)
+    {
+        while (true)
+        {
             //Change Posture
-            var actions = rpc.Decide().ToArray();
-            var action = actions.Where(a => a.Key.ToString().Equals("ChangePosture")).FirstOrDefault();
-
-            if(action != null)
+            var actions = agentRPC.Decide();
+            if (actions.Any())
             {
-                var posture = action.Parameters[0];
-                if (TUC != null)
+                var action = actions.ToArray().Where(a => a.Key.ToString().Equals("ChangePosture")).FirstOrDefault();
+
+                if (action != null)
                 {
-                    TUC.SetPosture("", posture.ToString(), 1, 0);
+                    var posture = action.Parameters[0];
+                    if (TUC != null)
+                    {
+                        TUC.SetPosture("", posture.ToString(), 1, 0);
+                    }
                 }
             }
             yield return new WaitForSeconds(updateTime);
@@ -145,47 +180,51 @@ public class SingleCharacterDemo : MonoBehaviour
     }
 
 
-    private string DetermineAgentDialogue()
+    private IEnumerator DetermineAgentDialogue(float updateTime)
     {
-        var actions = rpc.Decide().ToArray();
-        var action = actions.Where(a => a.Key.ToString().Equals(IATConsts.DIALOG_ACTION_KEY)).FirstOrDefault();
-
-        if (action != null)
+        while (true)
         {
-            Name cs = action.Parameters[0];
-            Name ns = action.Parameters[1];
-            Name m = action.Parameters[2];
-            Name s = action.Parameters[3];
-            var dialogs = iat.GetDialogueActions(IATConsts.AGENT, cs, ns, m, s);
-            var dialog = dialogs.Shuffle().FirstOrDefault();
+            var actions = agentRPC.Decide().ToArray();
+            var action = actions.Where(a => a.Key.ToString().Equals(IATConsts.DIALOG_ACTION_KEY)).FirstOrDefault();
 
-            HandleSpeakAction(rpc.CharacterName.ToString(), dialog.Id, IATConsts.PLAYER);
+            if (action != null)
+            {
+                Name cs = action.Parameters[0];
+                Name ns = action.Parameters[1];
+                Name m = action.Parameters[2];
+                Name s = action.Parameters[3];
+                var dialogs = iat.GetDialogueActions(cs, ns, m, s);
+                var dialog = dialogs.Shuffle().FirstOrDefault();
+                var processed = this.ReplaceVariablesInDialogue(dialog.Utterance);
 
-            CurrentDialogueState = ns.ToString();
-            var processed = this.ReplaceVariablesInDialogue(dialog.Utterance);
-            return processed;
-        }
-        else
-        {
-            return String.Empty;
+                HandleSpeakAction(dialog.Id, agentRPC.CharacterName.ToString(), IATConsts.PLAYER);
+                AgentUtterance.text = processed;
+                if (TUC != null && !string.IsNullOrEmpty(agentDialogue))
+                {
+                    TUC.PerformUtterance("", agentDialogue, "");
+                }
+            }
+            yield return new WaitForSeconds(updateTime);
         }
     }
+    #endregion
 
     //This method will replace every belief within [[ ]] by its value
     private string ReplaceVariablesInDialogue(string dialog)
     {
         var tokens = Regex.Split(dialog, @"\[|\]\]");
-       
+
         var result = string.Empty;
         bool process = false;
         foreach (var t in tokens)
         {
             if (process)
             {
-                var beliefValue = rpc.GetBeliefValue(t);
+                var beliefValue = agentRPC.GetBeliefValue(t);
                 result += beliefValue;
                 process = false;
-            }else if (t == string.Empty)
+            }
+            else if (t == string.Empty)
             {
                 process = true;
                 continue;
@@ -198,30 +237,29 @@ public class SingleCharacterDemo : MonoBehaviour
         return result;
     }
 
-    private void UpdatePlayerDialogOptions()
+    private void UpdatePlayerDialogOptions(bool resetPageNumber)
     {
-        var dOpt = iat.GetDialogueActionsByState(IATConsts.PLAYER, CurrentDialogueState);
-        var additional = iat.GetDialogueActionsByState(IATConsts.PLAYER, "Any");
 
-        dOpt = dOpt.Concat(additional);
+        if (resetPageNumber)
+            currentPageNumber = 0;
 
         var pageSize = DialogueButtons.Count();
 
-        this.UpdatePageButtons(dOpt.Count(), pageSize);
+        this.UpdatePageButtons(playerDialogues.Count(), pageSize);
 
         var aux = currentPageNumber * pageSize;
 
         for (int i = 0; i < DialogueButtons.Count(); i++)
         {
-            if (i + aux >= dOpt.Count())
+            if (i + aux >= playerDialogues.Count())
             {
                 DialogueButtons[i].gameObject.SetActive(false);
             }
             else
             {
                 DialogueButtons[i].gameObject.SetActive(true);
-                DialogueButtons[i].GetComponentInChildren<Text>().text = dOpt.ElementAt(i + aux).Utterance;
-                var id = dOpt.ElementAt(i+ aux).Id;
+                DialogueButtons[i].GetComponentInChildren<Text>().text = playerDialogues.ElementAt(i + aux).Utterance;
+                var id = playerDialogues.ElementAt(i + aux).Id;
                 DialogueButtons[i].onClick.RemoveAllListeners();
                 DialogueButtons[i].onClick.AddListener(() => OnDialogueSelected(id));
             }
@@ -230,7 +268,7 @@ public class SingleCharacterDemo : MonoBehaviour
 
     private void UpdatePageButtons(int numOfOptions, int pageSize)
     {
-        if (numOfOptions > pageSize * (currentPageNumber+1))
+        if (numOfOptions > pageSize * (currentPageNumber + 1))
         {
             this.NextPageButton.gameObject.SetActive(true);
         }
@@ -252,64 +290,68 @@ public class SingleCharacterDemo : MonoBehaviour
     public void OnNextPage()
     {
         currentPageNumber++;
-        UpdatePlayerDialogOptions();
+        UpdatePlayerDialogOptions(false);
     }
 
     public void OnPreviousPage()
     {
         currentPageNumber--;
-        UpdatePlayerDialogOptions();
+        UpdatePlayerDialogOptions(false);
     }
 
 
     public void OnDialogueSelected(Guid dialogId)
     {
-        HandleSpeakAction(IATConsts.PLAYER, dialogId, rpc.CharacterName.ToString());
+        var d = iat.GetDialogActionById(dialogId);
+
+        if (d.Utterance.Contains("Restart"))
+        {
+            StopAllCoroutines();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        if (configResetEmotions)
+        {
+            var currentMood = agentRPC.Mood;
+            agentRPC.ResetEmotionalState();
+            agentRPC.Mood = currentMood;
+        }
+        HandleSpeakAction(dialogId, "Player", agentRPC.CharacterName.ToString());
     }
 
-    private void HandleSpeakAction(string s, Guid id, string t)
+    private void HandleSpeakAction(Guid id, string subject, string target)
     {
-        DialogueStateActionDTO d;
-        if (s.Equals(IATConsts.PLAYER))
-        {
-            d = iat.GetDialogActionById(IATConsts.PLAYER, id);
+        var d = iat.GetDialogActionById(id);
 
-            if (d.Utterance.Contains("Restart"))
-            {
-                StopAllCoroutines();
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-                return;
-            }
+        var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.Meaning, d.Style);
 
-            if (configResetEmotions)
-            {
-                var currentMood = rpc.Mood;
-                rpc.ResetEmotionalState();
-                rpc.Mood = currentMood;
-            }
-        }
-        else
-        {
-            d = iat.GetDialogActionById(IATConsts.AGENT, id);
-        }
+        agentRPC.Perceive(EventHelper.ActionEnd(subject, dAct, target));
+        playerRPC.Perceive(EventHelper.ActionEnd(subject, dAct, target));
 
-        var dAct = string.Format("Speak({0},{1},{2},{3})", d.CurrentState, d.NextState, d.GetMeaningName(), d.GetStylesName());
-        var dStateProperty = string.Format(IATConsts.DIALOGUE_STATE_PROPERTY, IATConsts.PLAYER);
+        var dStatePropertyAgent = string.Format(IATConsts.DIALOGUE_STATE_PROPERTY, IATConsts.PLAYER);
+        var dStatePropertyPlayer = string.Format(IATConsts.DIALOGUE_STATE_PROPERTY, agentRPC.CharacterName.ToString());
 
-        rpc.Perceive(EventHelper.ActionEnd(s, dAct, t));
-        rpc.Perceive(EventHelper.PropertyChange(dStateProperty, d.NextState, s));
+        agentRPC.Perceive(EventHelper.PropertyChange(dStatePropertyAgent, d.NextState, subject));
+        playerRPC.Perceive(EventHelper.PropertyChange(dStatePropertyPlayer, d.NextState, subject));
+
+        agentRPC.Perceive(EventHelper.PropertyChange("Has(Floor)", target, subject));
+        playerRPC.Perceive(EventHelper.PropertyChange("Has(Floor)", target, subject));
 
         if (configLog)
         {
             this.SaveState();
         }
+
+        playerDialogues = DeterminePlayerDialogues();
+        UpdatePlayerDialogOptions(true);
     }
 
     private void SaveState()
     {
         const string datePattern = "dd-MM-yyyy-H-mm-ss";
-        rpc.SaveToFile(Application.streamingAssetsPath
-            + "\\Logs\\" + rpc.CharacterName
+        agentRPC.SaveToFile(Application.streamingAssetsPath
+            + "\\Logs\\" + agentRPC.CharacterName
             + "-" + DateTime.Now.ToString(datePattern) + ".rpc");
     }
 }
